@@ -1,0 +1,1 @@
+# spring-boot-s2i-app-pipeline
