@@ -1,0 +1,83 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: spring-boot-s2i-app 
+  annotations:
+    description: Sample spring boot s2i app 
+    tags: java,springboot
+    iconClass: ''
+objects:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+    labels:
+      app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
+    name: spring-boot-s2i-app-git
+  spec:
+    lookupPolicy:
+      local: false
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+    labels:
+      app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
+    name: spring-boot-s2i-app-git
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: spring-boot-s2i-app-git:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: /
+      git:
+        uri: ${APP_GIT_URL} 
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: java:8
+          namespace: openshift
+      type: Source
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - generic:
+        secretReference:
+          name: spring-boot-s2i-app-git-generic-webhook-secret
+      type: Generic
+    - github:
+        secretReference:
+          name: spring-boot-s2i-app-git-github-webhook-secret
+      type: GitHub
+    - imageChange:
+      type: ImageChange
+    - type: ConfigChange
+- name: APP_GIT_URL
+  displayName: Application Source Git URL
+  description: The Git URL of the application source code
+  required: true
+- name: SECRET
+  displayName: Webhook Secret
+  description: Secret for webhooks
+  generate: expression
+  from: '[a-zA-Z0-9]{40}'
+
