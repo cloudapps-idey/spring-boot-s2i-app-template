@@ -1,4 +1,4 @@
-# spring-boot-s2i-app-pipeline
+# spring-boot-s2i-app-pipeline ( in construction)
 
 This repo is developed to deploy the application that is in https://github.com/IndraniDey1/spring-boot-s2i-app.git 
 via template. This is in preparation to deploy via Jenkins. 
