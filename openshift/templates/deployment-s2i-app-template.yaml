@@ -219,7 +219,26 @@ objects:
               secretKeyRef:
                 key: spring.datasource.username
                 name: s2i-sec
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent 
+          livenessProbe:
+            httpGet:
+              path: /catfactservice/facts
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /catfactservice/facts
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+            failureThreshold: 3
           name: spring-boot-s2i-app-git
           ports:
           - containerPort: 8080

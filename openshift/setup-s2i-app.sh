@@ -1,4 +1,4 @@
-oc new-project s2i-app-pipeline
+#oc new-project s2i-app-pipeline
 oc create -f configmap/s2i-cm.yaml
 oc create -f secrets/idey-idey-sec.yaml
 oc create -f secrets/mysql-sec.yaml
