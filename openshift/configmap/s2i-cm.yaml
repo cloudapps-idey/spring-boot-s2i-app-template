@@ -18,3 +18,8 @@ data:
   logging.level.org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
   cat-fact.url: https://catfact.ninja/facts
+  server.ssl.key-store: /etc/keystore/keystore.p12
+  server.ssl.key-store-password: mysecret
+  server.port: "8443"
+  server.use-forward-headers: "true"
+

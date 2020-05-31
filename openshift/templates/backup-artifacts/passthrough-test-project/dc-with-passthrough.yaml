@@ -1,0 +1,170 @@
+apiVersion: v1
+items:
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: "2020-05-30T15:58:31Z"
+    generation: 6
+    labels:
+      app: spring-boot-s2i-app
+    name: spring-boot-s2i-app
+    namespace: passthrough-test
+    resourceVersion: "1434710"
+    selfLink: /apis/apps.openshift.io/v1/namespaces/passthrough-test/deploymentconfigs/spring-boot-s2i-app
+    uid: 689627fe-a28e-11ea-8258-0a580a800015
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      app: spring-boot-s2i-app
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: spring-boot-s2i-app
+      spec:
+        containers:
+        - env:
+          - name: LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER
+            valueFrom:
+              configMapKeyRef:
+                key: logging.level.org.hibernate.type.descriptor.sql.BasicBinder
+                name: passthrough-cm
+          - name: SERVER_SSL_KEY_STORE
+            valueFrom:
+              configMapKeyRef:
+                key: server.ssl.key-store
+                name: passthrough-cm
+          - name: SPRING_DATASOURCE_TOMCAT_MAX_ACTIVE
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.tomcat.max-active
+                name: passthrough-cm
+          - name: LOGGING_LEVEL_ORG_HIBERNATE_SQL
+            valueFrom:
+              configMapKeyRef:
+                key: logging.level.org.hibernate.SQL
+                name: passthrough-cm
+          - name: SERVER_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: server.port
+                name: passthrough-cm
+          - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.driver.class.name
+                name: passthrough-cm
+          - name: SPRING_DATASOURCE_TOMCAT_MAX_IDLE
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.tomcat.max-idle
+                name: passthrough-cm
+          - name: SPRING_DATASOURCE_TOMCAT_MIN_IDLE
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.tomcat.min-idle
+                name: passthrough-cm
+          - name: CAT_FACT_URL
+            valueFrom:
+              configMapKeyRef:
+                key: cat-fact.url
+                name: passthrough-cm
+          - name: SPRING_DATASOURCE_URL
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.url
+                name: passthrough-cm
+          - name: SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL
+            valueFrom:
+              configMapKeyRef:
+                key: spring.jpa.properties.hibernate.format_sql
+                name: passthrough-cm
+          - name: SPRING_JPA_PROPERTIES_HIBERNATE_ID_NEW_GENERATOR_MAPPINGS
+            valueFrom:
+              configMapKeyRef:
+                key: spring.jpa.properties.hibernate.id.new_generator_mappings
+                name: passthrough-cm
+          - name: SERVER_SSL_KEY_STORE_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                key: server.ssl.key-store-password
+                name: passthrough-cm
+          - name: SPRING_DATASOURCE_TOMCAT_MAX_WAIT
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.tomcat.max-wait
+                name: passthrough-cm
+          - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+            valueFrom:
+              configMapKeyRef:
+                key: spring.jpa.properties.hibernate.dialect
+                name: passthrough-cm
+          - name: SERVER_USE_FORWARD_HEADERS
+            valueFrom:
+              configMapKeyRef:
+                key: server.use-forward-headers
+                name: passthrough-cm
+          image: image-registry.openshift-image-registry.svc:5000/openshift/spring-boot-s2i-app:latest
+          imagePullPolicy: Always
+          name: default-container
+          resources:
+            limits:
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/keystore
+            name: keystore-volume
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: keystore-volume
+          secret:
+            defaultMode: 420
+            secretName: passthrough-keystore
+    test: false
+    triggers:
+    - type: ConfigChange
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2020-05-30T17:44:21Z"
+      lastUpdateTime: "2020-05-30T17:44:21Z"
+      message: Deployment config has minimum availability.
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2020-05-30T17:58:28Z"
+      lastUpdateTime: "2020-05-30T17:58:30Z"
+      message: replication controller "spring-boot-s2i-app-6" successfully rolled
+        out
+      reason: NewReplicationControllerAvailable
+      status: "True"
+      type: Progressing
+    details:
+      causes:
+      - type: ConfigChange
+      message: config change
+    latestVersion: 6
+    observedGeneration: 6
+    readyReplicas: 1
+    replicas: 1
+    unavailableReplicas: 0
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

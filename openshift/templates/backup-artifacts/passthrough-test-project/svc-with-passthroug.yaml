@@ -1,0 +1,30 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: "2020-05-30T17:46:07Z"
+    labels:
+      app: spring-boot-s2i-app
+    name: spring-boot-s2i-app
+    namespace: passthrough-test
+    resourceVersion: "1428265"
+    selfLink: /api/v1/namespaces/passthrough-test/services/spring-boot-s2i-app
+    uid: 70fa0dcd-a29d-11ea-aaf7-120cf59b008d
+  spec:
+    clusterIP: 172.30.223.247
+    ports:
+    - name: 8443-8443
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    selector:
+      app: spring-boot-s2i-app
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

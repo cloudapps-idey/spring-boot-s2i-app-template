@@ -219,28 +219,27 @@ objects:
               secretKeyRef:
                 key: spring.datasource.username
                 name: s2i-sec
-          - name: SERVER_SSL_KEY_STORE
-            valueFrom:
-              configMapKeyRef:
-                key: server.ssl.key-store
-                name: s2i-cm
-          - name: SERVER_SSL_KEY_STORE_PASSWORD
-            valueFrom:
-              configMapKeyRef:
-                key: server.ssl.key-store-password
-                name: s2i-cm
-          - name: SERVER_PORT
-            valueFrom:
-              configMapKeyRef:
-                key: server.port
-                name: s2i-cm
-          - name: SERVER_USE_FORWARD_HEADERS
-            valueFrom:
-              configMapKeyRef:
-                key: server.use-forward-headers
-                name: s2i-cm
-          imagePullPolicy: Always 
-          name: spring-boot-s2i-app-git 
+          imagePullPolicy: IfNotPresent 
+          livenessProbe:
+            httpGet:
+              path: /catfactservice/facts
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /catfactservice/facts
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+            failureThreshold: 3
+          name: spring-boot-s2i-app-git
           ports:
           - containerPort: 8080
             protocol: TCP
@@ -251,19 +250,11 @@ objects:
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /etc/keystore
-            name: keystore-volume
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
-        volumes:
-        - name: keystore-volume
-          secret:
-            defaultMode: 420
-            secretName: s2i-app-keystore-secret        
     test: false
     triggers:
     - imageChangeParams:
@@ -310,7 +301,11 @@ objects:
     name: spring-boot-s2i-app-git
   spec:
     ports:
-    - name: 8443-8443
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: 8443-tcp
       port: 8443
       protocol: TCP
       targetPort: 8443
@@ -334,9 +329,7 @@ objects:
     name: spring-boot-s2i-app-git
   spec:
     port:
-      targetPort: 8443-8443
-    tls:
-      termination: passthrough
+      targetPort: 8080-tcp
     to:
       kind: Service
       name: spring-boot-s2i-app-git
