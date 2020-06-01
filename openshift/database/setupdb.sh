@@ -1,6 +1,6 @@
 mpod=$(oc get pods --selector app=mysql --output name | awk -F/ '{print $NF}')
 
-mpod=mysql-1-dz2l4
+mpod=mysql-1-j8gjb 
 echo "Copying setup files into pod..."
 oc cp database/create-book-table.sql $mpod:/tmp/create-book-table.sql
 oc cp database/insert-book-data.sql ${mpod}:/tmp/insert-book-data.sql

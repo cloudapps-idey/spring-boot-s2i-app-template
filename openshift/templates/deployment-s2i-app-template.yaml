@@ -252,7 +252,7 @@ objects:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
-          - mountPath: /etc/keystore
+          - mountPath: /etc/keystore3
             name: keystore-volume
         dnsPolicy: ClusterFirst
         restartPolicy: Always
@@ -263,7 +263,7 @@ objects:
         - name: keystore-volume
           secret:
             defaultMode: 420
-            secretName: s2i-app-keystore-secret        
+            secretName: fmcsslcerts        
     test: false
     triggers:
     - imageChangeParams:

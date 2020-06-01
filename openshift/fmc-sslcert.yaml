@@ -1,0 +1,19 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    spring.datasource.password: cGFzc3dvcmQ=
+    spring.datasource.username: dXNlcjE=
+  kind: Secret
+  metadata:
+    creationTimestamp: "2020-05-31T15:21:09Z"
+    name: s2i-sec
+    namespace: fmc-app
+    resourceVersion: "1944329"
+    selfLink: /api/v1/namespaces/fmc-app/secrets/s2i-sec
+    uid: 5ac3d7eb-a352-11ea-b4e1-0a200c87ec5d
+  type: Opaque
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
