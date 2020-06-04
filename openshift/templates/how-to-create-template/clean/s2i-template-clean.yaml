@@ -1,20 +1,85 @@
+kind: Template
 apiVersion: v1
-items:
+metadata:
+  name: spring-boot-s2i-app 
+  annotations:
+    description: Sample spring boot s2i app 
+    tags: java,springboot
+    iconClass: '
+objects:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+    labels:
+      app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
+    name: spring-boot-s2i-app-git
+  spec:
+    lookupPolicy:
+      local: false
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+    labels:
+      app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
+    name: spring-boot-s2i-app-git
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: spring-boot-s2i-app-git:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: /
+      git:
+        uri: https://github.com/IndraniDey1/spring-boot-s2i-app.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: java:8
+          namespace: openshift
+      type: Source
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - generic:
+        secretReference:
+          name: spring-boot-s2i-app-git-generic-webhook-secret
+      type: Generic
+    - github:
+        secretReference:
+          name: spring-boot-s2i-app-git-github-webhook-secret
+      type: GitHub
+    - imageChange:
+      type: ImageChange
+    - type: ConfigChange
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
     annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: "2020-05-29T23:27:48Z"
-    generation: 2
     labels:
       template: mysql-ephemeral-template
       template.openshift.io/template-instance-owner: 79a9cd7e-8ed7-49a7-ac8a-78c5ad06b900
     name: mysql
-    namespace: s2i-app
-    resourceVersion: "1606687"
-    selfLink: /apis/apps.openshift.io/v1/namespaces/s2i-app/deploymentconfigs/mysql
-    uid: 02345b70-a204-11ea-a4f2-0a580a820010
+    namespace: s2i-app-with-build
   spec:
     replicas: 1
     revisionHistoryLimit: 10
@@ -28,8 +93,6 @@ items:
       type: Recreate
     template:
       metadata:
-        annotations:
-          openshift.io/generated-by: OpenShiftNewApp
         creationTimestamp: null
         labels:
           name: mysql
@@ -56,7 +119,6 @@ items:
               secretKeyRef:
                 key: database-name
                 name: mysql
-          image: image-registry.openshift-image-registry.svc:5000/openshift/mysql@sha256:9a781abe7581cc141e14a7e404ec34125b3e89c008b14f4e7b41e094fd3049fe
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -89,7 +151,6 @@ items:
           securityContext:
             capabilities: {}
             privileged: false
-            procMount: Default
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
@@ -113,40 +174,14 @@ items:
           kind: ImageStreamTag
           name: mysql:5.7
           namespace: openshift
-        lastTriggeredImage: image-registry.openshift-image-registry.svc:5000/openshift/mysql@sha256:9a781abe7581cc141e14a7e404ec34125b3e89c008b14f4e7b41e094fd3049fe
       type: ImageChange
     - type: ConfigChange
-  status:
-    availableReplicas: 1
-    conditions:
-    - lastTransitionTime: "2020-05-29T23:27:58Z"
-      lastUpdateTime: "2020-05-29T23:28:33Z"
-      message: replication controller "mysql-1" successfully rolled out
-      reason: NewReplicationControllerAvailable
-      status: "True"
-      type: Progressing
-    - lastTransitionTime: "2020-05-31T00:09:00Z"
-      lastUpdateTime: "2020-05-31T00:09:00Z"
-      message: Deployment config has minimum availability.
-      status: "True"
-      type: Available
-    details:
-      causes:
-      - type: ConfigChange
-      message: config change
-    latestVersion: 1
-    observedGeneration: 2
-    readyReplicas: 1
-    replicas: 1
-    unavailableReplicas: 0
-    updatedReplicas: 1
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
     annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: "2020-05-30T19:16:34Z"
-    generation: 7
+      app.openshift.io/vcs-ref: master
+      app.openshift.io/vcs-uri: https://github.com/IndraniDey1/spring-boot-s2i-app.git
     labels:
       app: spring-boot-s2i-app-git
       app.kubernetes.io/component: spring-boot-s2i-app-git
@@ -156,10 +191,7 @@ items:
       app.openshift.io/runtime: java
       app.openshift.io/runtime-version: "8"
     name: spring-boot-s2i-app-git
-    namespace: s2i-app
-    resourceVersion: "1699638"
-    selfLink: /apis/apps.openshift.io/v1/namespaces/s2i-app/deploymentconfigs/spring-boot-s2i-app-git
-    uid: 1368cb3b-a2aa-11ea-b39b-0a580a820010
+    namespace: s2i-app-with-build
   spec:
     replicas: 1
     revisionHistoryLimit: 10
@@ -178,8 +210,6 @@ items:
       type: Rolling
     template:
       metadata:
-        annotations:
-          openshift.io/generated-by: OpenShiftNewApp
         creationTimestamp: null
         labels:
           app: spring-boot-s2i-app-git
@@ -257,27 +287,6 @@ items:
               secretKeyRef:
                 key: spring.datasource.username
                 name: s2i-sec
-          - name: SERVER_SSL_KEY_STORE
-            valueFrom:
-              configMapKeyRef:
-                key: server.ssl.key-store
-                name: s2i-cm
-          - name: SERVER_SSL_KEY_STORE_PASSWORD
-            valueFrom:
-              configMapKeyRef:
-                key: server.ssl.key-store-password
-                name: s2i-cm
-          - name: SERVER_PORT
-            valueFrom:
-              configMapKeyRef:
-                key: server.port
-                name: s2i-cm
-          - name: SERVER_USE_FORWARD_HEADERS
-            valueFrom:
-              configMapKeyRef:
-                key: server.use-forward-headers
-                name: s2i-cm
-          image: image-registry.openshift-image-registry.svc:5000/s2i-app/spring-boot-s2i-app-git@sha256:b1ba079fde018cba75ebc4ee7536cbe8b3657ccc207f005fd7310b5a1cdaaf96
           imagePullPolicy: Always
           name: spring-boot-s2i-app-git
           ports:
@@ -290,19 +299,11 @@ items:
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /etc/keystore
-            name: keystore-volume
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
-        volumes:
-        - name: keystore-volume
-          secret:
-            defaultMode: 420
-            secretName: s2i-app-keystore-secret
     test: false
     triggers:
     - imageChangeParams:
@@ -312,36 +313,75 @@ items:
         from:
           kind: ImageStreamTag
           name: spring-boot-s2i-app-git:latest
-          namespace: s2i-app
-        lastTriggeredImage: image-registry.openshift-image-registry.svc:5000/s2i-app/spring-boot-s2i-app-git@sha256:b1ba079fde018cba75ebc4ee7536cbe8b3657ccc207f005fd7310b5a1cdaaf96
+          namespace: s2i-app-with-build
       type: ImageChange
     - type: ConfigChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+    labels:
+      template: mysql-ephemeral-template
+      template.openshift.io/template-instance-owner: 79a9cd7e-8ed7-49a7-ac8a-78c5ad06b900
+    name: mysql
+  spec:
+    ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: 3306
+    selector:
+      name: mysql
+    sessionAffinity: None
+    type: ClusterIP
   status:
-    availableReplicas: 1
-    conditions:
-    - lastTransitionTime: "2020-05-31T02:57:32Z"
-      lastUpdateTime: "2020-05-31T02:57:32Z"
-      message: Deployment config has minimum availability.
-      status: "True"
-      type: Available
-    - lastTransitionTime: "2020-05-31T03:04:11Z"
-      lastUpdateTime: "2020-05-31T03:04:14Z"
-      message: replication controller "spring-boot-s2i-app-git-6" successfully rolled
-        out
-      reason: NewReplicationControllerAvailable
-      status: "True"
-      type: Progressing
-    details:
-      causes:
-      - type: Manual
-      message: manual change
-    latestVersion: 6
-    observedGeneration: 7
-    readyReplicas: 1
-    replicas: 1
-    unavailableReplicas: 0
-    updatedReplicas: 1
-kind: List
-metadata:
-  resourceVersion: ""
-  selfLink: ""
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+    labels:
+      app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
+    name: spring-boot-s2i-app-git
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: 8443-tcp
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    selector:
+      app: spring-boot-s2i-app-git
+      deploymentconfig: spring-boot-s2i-app-git
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    annotations:
+    labels:
+      app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
+    name: spring-boot-s2i-app-git
+  spec:
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: spring-boot-s2i-app-git
+      weight: 100
+    wildcardPolicy: None

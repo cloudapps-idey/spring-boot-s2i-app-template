@@ -1,0 +1,47 @@
+you do not have to start from scratch. You can export the artifacts from a current project and then make them generic by deleting specific data belong to the instance of the application such as timestamp, status, image triggers info etc. 
+
+In the directory template-work listed all the exported files and clean files. 
+
+
+oc get -o yaml --export bc > bc.yaml
+oc get -o yaml --export dc > dc.yaml
+oc get -o yaml --export is > is.yaml
+oc get -o yaml --export svc > svc.yaml
+oc get -o yaml --export route > route.yaml
+
+
+
+Make a copy of these files.
+ cp bc.yaml bc-clean.yaml
+ dc.yaml dc-clean.yaml
+ is.yaml is-clean.yaml
+ svc.yaml svc-clean.yaml
+ route.yaml route-clean.yaml
+
+clean the files.
+
+Create a file name app-template.yaml
+[ add this header ]
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: yourappname 
+  annotations:
+    openshift.io/display-name: Quotes Application
+    description: The Quotes application provides an HTTP API that returns a random, funny quote.
+    iconClass: icon-php
+    tags: springboot  < or php,nodejs etc> 
+objects:
+
+$ cat is-clean.yaml >> ~/app-template-clean.yaml
+$ cat bc-clean.yaml >> ~/app-template-clean.yaml
+$ cat dc-clean.yaml >> ~/app-template-clean.yaml
+$ cat svc-clean.yaml >> ~/app-template-clean.yaml
+$ cat route-clean.yaml >> ~/app-template-clean.yaml
+
+cp app-template.yaml s2i-template.yaml
+Add parameter as needed. See the parameters file
+
+Final file: s2i-template.yaml 
+
+

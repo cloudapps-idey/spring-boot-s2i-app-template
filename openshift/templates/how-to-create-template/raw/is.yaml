@@ -1,0 +1,40 @@
+apiVersion: v1
+items:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      app.openshift.io/vcs-ref: master
+      app.openshift.io/vcs-uri: https://github.com/IndraniDey1/spring-boot-s2i-app.git
+    creationTimestamp: "2020-05-05T05:38:27Z"
+    generation: 1
+    labels:
+      app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
+    name: spring-boot-s2i-app-git
+    namespace: s2i-app-with-build
+    resourceVersion: "2308373"
+    selfLink: /apis/image.openshift.io/v1/namespaces/s2i-app-with-build/imagestreams/spring-boot-s2i-app-git
+    uid: 02bdce31-a717-4cea-b76e-d34347c89bfa
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: image-registry.openshift-image-registry.svc:5000/s2i-app-with-build/spring-boot-s2i-app-git
+    publicDockerImageRepository: default-route-openshift-image-registry.apps.cluster-nyc-49fc.nyc-49fc.example.opentlc.com/s2i-app-with-build/spring-boot-s2i-app-git
+    tags:
+    - items:
+      - created: "2020-05-05T05:39:47Z"
+        dockerImageReference: image-registry.openshift-image-registry.svc:5000/s2i-app-with-build/spring-boot-s2i-app-git@sha256:063477d5c563e30d44f1d3883c804a72231e1020a1833c5e09bcc4c96e7b6c0e
+        generation: 1
+        image: sha256:063477d5c563e30d44f1d3883c804a72231e1020a1833c5e09bcc4c96e7b6c0e
+      tag: latest
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

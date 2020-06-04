@@ -1,21 +1,12 @@
-apiVersion: v1
-items:
 - apiVersion: v1
   kind: Service
   metadata:
     annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: "2020-05-29T23:27:48Z"
     labels:
       template: mysql-ephemeral-template
       template.openshift.io/template-instance-owner: 79a9cd7e-8ed7-49a7-ac8a-78c5ad06b900
     name: mysql
-    namespace: s2i-app
-    resourceVersion: "1110530"
-    selfLink: /api/v1/namespaces/s2i-app/services/mysql
-    uid: 023a83ed-a204-11ea-82b8-0a200c87ec5d
   spec:
-    clusterIP: 172.30.9.174
     ports:
     - name: mysql
       port: 3306
@@ -30,28 +21,28 @@ items:
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: "2020-05-31T02:46:26Z"
+    annotations:
     labels:
       app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
     name: spring-boot-s2i-app-git
-    namespace: s2i-app
-    resourceVersion: "1690107"
-    selfLink: /api/v1/namespaces/s2i-app/services/spring-boot-s2i-app-git
-    uid: ec33ce15-a2e8-11ea-84d0-021dbf8d7f47
   spec:
-    clusterIP: 172.30.150.119
     ports:
-    - name: 8443-8443
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: 8443-tcp
       port: 8443
       protocol: TCP
       targetPort: 8443
     selector:
       app: spring-boot-s2i-app-git
+      deploymentconfig: spring-boot-s2i-app-git
     sessionAffinity: None
     type: ClusterIP
-  status:
-    loadBalancer: {}
-kind: List
-metadata:
-  resourceVersion: ""
-  selfLink: ""
