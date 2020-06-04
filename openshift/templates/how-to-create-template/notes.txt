@@ -27,8 +27,8 @@ kind: Template
 metadata:
   name: yourappname 
   annotations:
-    openshift.io/display-name: Quotes Application
-    description: The Quotes application provides an HTTP API that returns a random, funny quote.
+    openshift.io/display-name: Sample Application
+    description: The Sample application description
     iconClass: icon-php
     tags: springboot  < or php,nodejs etc> 
 objects:
