@@ -1,0 +1,360 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: spring-boot-s2i-app 
+  annotations:
+    description: Sample spring boot s2i app 
+    tags: java,springboot
+    iconClass: ''
+objects:
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+    labels:
+      template: mysql-ephemeral-template
+      template.openshift.io/template-instance-owner: 79a9cd7e-8ed7-49a7-ac8a-78c5ad06b900
+    name: mysql
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      name: mysql
+    strategy:
+      activeDeadlineSeconds: 21600
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      type: Recreate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: mysql
+      spec:
+        containers:
+        - env:
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: mysql
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-password
+                name: mysql
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-root-password
+                name: mysql
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                key: database-name
+                name: mysql
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 3306
+            timeoutSeconds: 1
+          name: mysql
+          ports:
+          - containerPort: 3306
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - MYSQL_PWD="$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE
+                -e 'SELECT 1'
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 512Mi
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/mysql/data
+            name: mysql-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: mysql-data
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - mysql
+        from:
+          kind: ImageStreamTag
+          name: mysql:5.7
+          namespace: openshift
+      type: ImageChange
+    - type: ConfigChange
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+    labels:
+      app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
+    name: spring-boot-s2i-app-git
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      app: spring-boot-s2i-app-git
+      deploymentconfig: spring-boot-s2i-app-git
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: spring-boot-s2i-app-git
+          deploymentconfig: spring-boot-s2i-app-git
+      spec:
+        containers:
+        - env:
+          - name: LOGGING_LEVEL_ORG_HIBERNATE_SQL
+            valueFrom:
+              configMapKeyRef:
+                key: logging.level.org.hibernate.SQL
+                name: s2i-cm
+          - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.driver.class.name
+                name: s2i-cm
+          - name: SPRING_DATASOURCE_TOMCAT_MAX_ACTIVE
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.tomcat.max-active
+                name: s2i-cm
+          - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+            valueFrom:
+              configMapKeyRef:
+                key: spring.jpa.properties.hibernate.dialect
+                name: s2i-cm
+          - name: SPRING_JPA_PROPERTIES_HIBERNATE_ID_NEW_GENERATOR_MAPPINGS
+            valueFrom:
+              configMapKeyRef:
+                key: spring.jpa.properties.hibernate.id.new_generator_mappings
+                name: s2i-cm
+          - name: CAT_FACT_URL
+            valueFrom:
+              configMapKeyRef:
+                key: cat-fact.url
+                name: s2i-cm
+          - name: LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER
+            valueFrom:
+              configMapKeyRef:
+                key: logging.level.org.hibernate.type.descriptor.sql.BasicBinder
+                name: s2i-cm
+          - name: SPRING_DATASOURCE_TOMCAT_MAX_IDLE
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.tomcat.max-idle
+                name: s2i-cm
+          - name: SPRING_DATASOURCE_TOMCAT_MAX_WAIT
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.tomcat.max-wait
+                name: s2i-cm
+          - name: SPRING_DATASOURCE_TOMCAT_MIN_IDLE
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.tomcat.min-idle
+                name: s2i-cm
+          - name: SPRING_DATASOURCE_URL
+            valueFrom:
+              configMapKeyRef:
+                key: spring.datasource.url
+                name: s2i-cm
+          - name: SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL
+            valueFrom:
+              configMapKeyRef:
+                key: spring.jpa.properties.hibernate.format_sql
+                name: s2i-cm
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: spring.datasource.password
+                name: s2i-sec
+          - name: SPRING_DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: spring.datasource.username
+                name: s2i-sec
+          - name: SERVER_SSL_KEY_STORE
+            valueFrom:
+              configMapKeyRef:
+                key: server.ssl.key-store
+                name: s2i-cm
+          - name: SERVER_SSL_KEY_STORE_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                key: server.ssl.key-store-password
+                name: s2i-cm
+          - name: SERVER_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: server.port
+                name: s2i-cm
+          - name: SERVER_USE_FORWARD_HEADERS
+            valueFrom:
+              configMapKeyRef:
+                key: server.use-forward-headers
+                name: s2i-cm
+          imagePullPolicy: Always 
+          name: spring-boot-s2i-app-git 
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          - containerPort: 8778
+            protocol: TCP
+          resources:
+            request:
+              memory: 512Mi 
+              cpu: 100m
+            limits:
+              memory: 512Mi 
+              cpu: 100m  
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/keystore
+            name: keystore-volume
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: keystore-volume
+          secret:
+            defaultMode: 420
+            secretName: fmcsslcerts        
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - spring-boot-s2i-app-git
+        from:
+          kind: ImageStreamTag
+          name: spring-boot-s2i-app-git:latest
+      type: ImageChange
+    - type: ConfigChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+    labels:
+      template: mysql-ephemeral-template
+      template.openshift.io/template-instance-owner: 79a9cd7e-8ed7-49a7-ac8a-78c5ad06b900
+    name: mysql
+  spec:
+    ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: 3306
+    selector:
+      name: mysql
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+    labels:
+      app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
+    name: spring-boot-s2i-app-git
+  spec:
+    ports:
+    - name: 8443-8443
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    selector:
+      app: spring-boot-s2i-app-git
+      deploymentconfig: spring-boot-s2i-app-git
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    annotations:
+    labels:
+      app: spring-boot-s2i-app-git
+      app.kubernetes.io/component: spring-boot-s2i-app-git
+      app.kubernetes.io/instance: spring-boot-s2i-app-git
+      app.kubernetes.io/name: java
+      app.kubernetes.io/part-of: spring-boot-s-2-i-app-git-app
+      app.openshift.io/runtime: java
+      app.openshift.io/runtime-version: "8"
+    name: spring-boot-s2i-app-git
+  spec:
+    port:
+      targetPort: 8443-8443
+    tls:
+      termination: passthrough
+    to:
+      kind: Service
+      name: spring-boot-s2i-app-git
+      weight: 100
+    wildcardPolicy: None
+parameters:
+- name: APP_GIT_URL
+  displayName: Application Source Git URL
+  description: The Git URL of the application source code
+  required: true
+- name: SECRET
+  displayName: Webhook Secret
+  description: Secret for webhooks
+  generate: expression
+  from: '[a-zA-Z0-9]{40}'
