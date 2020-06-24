@@ -2,7 +2,7 @@
 oc delete all --all
 oc delete cm s2i-cm
 oc delete secret mysql-sec
-oc delete secret ssl-sec
+oc delete secret sslcert-sec
 oc delete secret quay-sec
 oc delete secret s2i-sec
 ~                             

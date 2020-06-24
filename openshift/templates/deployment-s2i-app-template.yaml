@@ -38,22 +38,22 @@ objects:
             valueFrom:
               secretKeyRef:
                 key: database-user
-                name: mysql
+                name: mysql-sec
           - name: MYSQL_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: database-password
-                name: mysql
+                name: mysql-sec
           - name: MYSQL_ROOT_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: database-root-password
-                name: mysql
+                name: mysql-sec
           - name: MYSQL_DATABASE
             valueFrom:
               secretKeyRef:
                 key: database-name
-                name: mysql
+                name: mysql-sec 
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -269,7 +269,7 @@ objects:
         - name: keystore-volume
           secret:
             defaultMode: 420
-            secretName: fmcsslcerts        
+            secretName: sslcert-sec        
     test: false
     triggers:
     - imageChangeParams:
